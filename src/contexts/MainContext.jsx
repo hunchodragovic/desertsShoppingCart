@@ -105,13 +105,63 @@ const desertsData = [
 
 export const MainProvider = ({ children }) => {
   const [deserts, setDeserts] = useState(desertsData);
+  const [cartItems, setCartItems] = useState([]); // Store actual cart items instead of just indices
+
+  // Modified handleAddToCart function to handle quantity increases
+  const handleAddToCart = (index) => {
+    // Get the desert object from the deserts array using the index
+    const desertToAdd = deserts[index];
+
+    // Make sure the desert exists
+    if (desertToAdd) {
+      // Check if the item is already in cart
+      const existingItemIndex = cartItems.findIndex(
+        (item) => item.name === desertToAdd.name
+      );
+
+      // Create a new cart array to avoid direct state mutation
+      let newCartItems;
+
+      if (existingItemIndex !== -1) {
+        // Item already exists, increment its quantity
+        newCartItems = [...cartItems];
+        newCartItems[existingItemIndex] = {
+          ...newCartItems[existingItemIndex],
+          quantity: newCartItems[existingItemIndex].quantity + 1,
+        };
+        console.log(
+          `Increased quantity of "${desertToAdd.name}" to ${newCartItems[existingItemIndex].quantity}`
+        );
+      } else {
+        // Item doesn't exist in cart, add it with quantity 1
+        const newItem = {
+          ...desertToAdd,
+          id: Date.now(), // Add a unique identifier for this cart item
+          quantity: 1, // Initialize quantity to 1
+        };
+        newCartItems = [...cartItems, newItem];
+        console.log(`Added new item to cart: "${desertToAdd.name}"`);
+      }
+
+      // Update the cartItems state
+      setCartItems(newCartItems);
+
+      // Log the updated cart
+      console.log("Current cart items:", newCartItems);
+    }
+  };
+
   const value = {
     deserts,
     setDeserts,
+    cartItems, // Expose cartItems instead of addedItems
+    setCartItems, // Expose method to update cartItems
+    handleAddToCart,
   };
 
   return <MainContext.Provider value={value}>{children}</MainContext.Provider>;
 };
+
 export const useMainContext = () => {
   return useContext(MainContext);
 };

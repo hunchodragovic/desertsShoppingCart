@@ -1,27 +1,42 @@
-import React, { useState } from "react";
+import React from "react";
 import { useMainContext } from "../contexts/MainContext";
 
 const Card = () => {
-  const { deserts } = useMainContext();
+  // Update to use cartItems instead of addedItems
+  const { deserts, cartItems, handleAddToCart } = useMainContext();
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-      {deserts.map((desert, index) => (
-        <CardItem key={index} desert={desert} />
-      ))}
+      {deserts.map((desert, index) => {
+        // Check if this desert is in the cart by checking if any cart item has matching name
+        const isItemAdded = cartItems.some((item) => item.name === desert.name);
+
+        // Find the item in cart to get its quantity (if it exists)
+        const cartItem = cartItems.find((item) => item.name === desert.name);
+        const quantity = cartItem ? cartItem.quantity : 0;
+
+        return (
+          <CardItem
+            key={index}
+            index={index}
+            desert={desert}
+            isItemAdded={isItemAdded}
+            quantity={quantity}
+            handleAddToCart={handleAddToCart}
+          />
+        );
+      })}
     </div>
   );
 };
 
-const CardItem = ({ desert }) => {
-  const [isAdded, setIsAdded] = useState(false);
-
-  const handleAddToCart = () => {
-    setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 1000); // Reset after 1 second
-    console.log("Item added to cart!");
-  };
-
+const CardItem = ({
+  index,
+  desert,
+  isItemAdded,
+  quantity,
+  handleAddToCart,
+}) => {
   return (
     <div className="w-full shadow-md rounded-md p-2 sm:p-3 lg:p-4 transition-transform hover:shadow-lg hover:scale-105">
       <div className="relative w-full flex flex-col justify-center items-center bg-transparent rounded-md">
@@ -33,21 +48,27 @@ const CardItem = ({ desert }) => {
           />
         </div>
         <button
-          className={`absolute -bottom-4 flex justify-center items-center rounded-full border border-[hsl(14,86%,42%)] 
-            p-2 sm:p-3 cursor-pointer bg-white font-bold text-xs sm:text-sm transition-all 
-            hover:bg-[hsl(14,86%,42%)] hover:text-white ${
-              isAdded ? "bg-[hsl(14,86%,42%)] text-white" : ""
-            }`}
-          onClick={handleAddToCart}
+          className={`absolute -bottom-4 flex justify-center items-center rounded-full border 
+          border-[hsl(14,86%,42%)] p-2 sm:p-3 cursor-pointer font-bold text-xs sm:text-sm transition-all
+          ${
+            isItemAdded
+              ? "bg-[hsl(14,86%,42%)] text-white"
+              : "bg-white text-[hsl(14,86%,42%)]"
+          } hover:bg-[hsl(14,86%,42%)] hover:text-white `}
+          onClick={() => handleAddToCart(index)}
         >
           <span className="flex items-center">
             <img
               src="/images/icon-add-to-cart.svg"
               alt="Add to cart"
-              className="w-4 h-4 sm:w-5 sm:h-5 mx-1 sm:mx-2"
+              className={`w-4 h-4 sm:w-5 sm:h-5 mx-1 sm:mx-2 ${
+                isItemAdded ? "filter brightness-0 invert" : ""
+              }`}
             />
           </span>
-          <span className="mr-1 sm:mr-2">Add to Cart</span>
+          <span className="mr-1 sm:mr-2 ">
+            {isItemAdded ? `Added (${quantity})` : "Add to Cart "}
+          </span>
         </button>
       </div>
       <div className="flex flex-col justify-center items-start pt-6 p-1 sm:p-2 gap-y-1 sm:gap-y-2">
