@@ -107,6 +107,36 @@ export const MainProvider = ({ children }) => {
   const [deserts, setDeserts] = useState(desertsData);
   const [cartItems, setCartItems] = useState([]); // Store actual cart items instead of just indices
 
+  const removeFromCart = (itemId) => {
+    // Find the item in the cart by its unique ID
+    const itemIndex = cartItems.findIndex((item) => item.id === itemId);
+
+    // If item doesn't exist in cart, do nothing
+    if (itemIndex === -1) return;
+
+    // Create a copy of the current cart items
+    const updatedCartItems = [...cartItems];
+
+    // If quantity is more than 1, decrease quantity
+    if (updatedCartItems[itemIndex].quantity > 1) {
+      updatedCartItems[itemIndex] = {
+        ...updatedCartItems[itemIndex],
+        quantity: updatedCartItems[itemIndex].quantity - 1,
+      };
+      console.log(
+        `Decreased quantity of "${updatedCartItems[itemIndex].name}" to ${updatedCartItems[itemIndex].quantity}`
+      );
+    } else {
+      // If quantity is 1, remove the item completely
+      updatedCartItems.splice(itemIndex, 1);
+      console.log(`Removed "${cartItems[itemIndex].name}" from cart`);
+    }
+
+    // Update the cart state
+    setCartItems(updatedCartItems);
+    console.log("Current cart items:", updatedCartItems);
+  };
+
   // Modified handleAddToCart function to handle quantity increases
   const handleAddToCart = (index) => {
     // Get the desert object from the deserts array using the index
@@ -153,6 +183,7 @@ export const MainProvider = ({ children }) => {
 
   const value = {
     deserts,
+    removeFromCart,
     setDeserts,
     cartItems, // Expose cartItems instead of addedItems
     setCartItems, // Expose method to update cartItems

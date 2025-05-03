@@ -4,6 +4,7 @@ import { useMainContext } from "../contexts/MainContext";
 const Card = () => {
   // Update to use cartItems instead of addedItems
   const { deserts, cartItems, handleAddToCart } = useMainContext();
+  console.log(cartItems);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
@@ -71,9 +72,9 @@ const CardItem = ({
           </span>
         </button>
       </div>
-      <div className="flex flex-col justify-center items-start pt-6 p-1 sm:p-2 gap-y-1 sm:gap-y-2">
+      <div className="mt-4 flex flex-col justify-center items-start pt-6 p-1 sm:p-2 gap-y-1 sm:gap-y-2 ">
         <p className="text-gray-500 text-xs sm:text-sm">{desert.category}</p>
-        <h2 className="text-black font-bold text-sm sm:text-base">
+        <h2 className="text-black font-bold text-sm sm:text-base ">
           {desert.name}
         </h2>
         <p className="text-[hsl(14,86%,42%)] font-bold text-lg sm:text-xl">
